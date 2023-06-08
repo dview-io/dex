@@ -1,24 +1,33 @@
-{{- /* NOTE: This configuration file is an example and exists only for development purposes. */ -}}
-{{- /* To find more about gomplate formatting, please visit its documentation site - https://docs.gomplate.ca/ */ -}}
-issuer: {{ getenv "DEX_ISSUER" "http://127.0.0.1:5556/dex" }}
+issuer: {{ getenv "DEX_ISSUER" }}
 
 storage:
-  type: sqlite3
+  type: mysql
   config:
-    file: {{ getenv "DEX_STORAGE_SQLITE3_CONFIG_FILE" "/var/dex/dex.db" }}
+    host: {{ getenv "MYSQL_DB_HOST" }}
+    port: {{ getenv "MYSQL_PORT" }}
+    database: {{ getenv "DEX_DB" }}
+    user: {{ getenv "MYSQL_USR" }}
+    password: {{ getenv "MYSQL_PWD" }}
+    ssl:
+      # mode: {{ getenv "DEX_SSL_MODE" "false"}}
+      mode: "false"
 
+    # host: {{ getenv "MYSQL_HOST" "dview-integ-test.cjab8ksmggyx.ap-south-1.rds.amazonaws.com" }}
+    # port: {{ getenv "MYSQL_PORT" "3306" }}
+    # database: {{ getenv "MYSQL_DATABASE" "dex" }}
+    # user: {{ getenv "MYSQL_USR" "data" }}
+    # password: {{ getenv "MYSQL_PWD" "Dview123" }}
+    # ssl:
+    #   # mode: {{ getenv "DEX_SSL_MODE" "false"}}
+    #   mode: "false"
 web:
-{{- if getenv "DEX_WEB_HTTPS" "" }}
-  https: {{ .Env.DEX_WEB_HTTPS }}
-  tlsKey: {{ getenv "DEX_WEB_TLS_KEY" | required "$DEX_WEB_TLS_KEY in case of web.https is enabled" }}
-  tlsCert: {{ getenv "DEX_WEB_TLS_CERT" | required "$DEX_WEB_TLS_CERT in case of web.https is enabled" }}
-{{- end }}
+  # https: {{ getenv "DEX_WEB_HTTPS" }}
   http: {{ getenv "DEX_WEB_HTTP" "0.0.0.0:5556" }}
 
-{{- if getenv "DEX_TELEMETRY_HTTP" }}
+# {{- if getenv "DEX_TELEMETRY_HTTP" }}
 telemetry:
   http: {{ .Env.DEX_TELEMETRY_HTTP }}
-{{- end }}
+# {{- end }}
 
 expiry:
   deviceRequests: {{ getenv "DEX_EXPIRY_DEVICE_REQUESTS" "5m" }}
@@ -31,18 +40,36 @@ logger:
   format: {{ getenv "DEX_LOG_FORMAT" "text" }}
 
 oauth2:
-  responseTypes: {{ getenv "DEX_OAUTH2_RESPONSE_TYPES" "[code]" }}
-  skipApprovalScreen: {{ getenv "DEX_OAUTH2_SKIP_APPROVAL_SCREEN" "false" }}
-  alwaysShowLoginScreen: {{ getenv "DEX_OAUTH2_ALWAYS_SHOW_LOGIN_SCREEN" "false" }}
-{{- if getenv "DEX_OAUTH2_PASSWORD_CONNECTOR" "" }}
-  passwordConnector: {{ .Env.DEX_OAUTH2_PASSWORD_CONNECTOR }}
-{{- end }}
+  # responseTypes: {{ getenv "DEX_OAUTH2_RESPONSE_TYPES" "[code]" }}
+  skipApprovalScreen: true
+  alwaysShowLoginScreen: false
+# {{- if getenv "DEX_OAUTH2_PASSWORD_CONNECTOR" "" }}
+  # passwordConnector: {{ .Env.DEX_OAUTH2_PASSWORD_CONNECTOR }}
+# {{- end }}
 
-enablePasswordDB: {{ getenv "DEX_ENABLE_PASSWORD_DB" "true" }}
+staticClients:
+# - id: example-app
+- id: {{ getenv "OAUTH_CLIENT_ID" }}
+  redirectURIs:
+  - 'http://127.0.0.1:5555/callback'
+  - 'http://localhost:18000/platform/v1/connection/callback'
+  - 'http://localhost:3000/callback'
+  - 'http://a52aaa50fb9e1478f97eb53f6e74c569-1975182668.ap-south-1.elb.amazonaws.com:8080/callback'
+  - 'https://mirage.int-dview.io/callback'
+  - 'https://mirage.dview.io/callback'
+  name: 'Dex Server'
+  secret: {{ getenv "OAUTH_CLIENT_SECRET" }}
+
+
+enablePasswordDB: true
 
 connectors:
-{{- if getenv "DEX_CONNECTORS_ENABLE_MOCK" }}
-- type: mockCallback
-  id: mock
-  name: Example
-{{- end }}
+- type: google
+  id: google
+  name: Google
+  config:
+    issuer: {{ getenv "DEX_CONNECTOR_DOMAIN_URL" "https://accounts.google.com" }}
+    # Connector config values starting with a "$" will read from the environment.
+    clientID: {{ getenv "OAUTH_CLIENT_ID" }}
+    clientSecret: {{ getenv "OAUTH_CLIENT_SECRET" }}
+    redirectURI: {{ getenv "DEX_REDIRECT_URI" "https://dex.int-dview.io/dex/callback" }}

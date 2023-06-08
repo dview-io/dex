@@ -55,6 +55,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifi
 
 COPY --from=stager --chown=1001:1001 /var/dex /var/dex
 COPY --from=stager --chown=1001:1001 /etc/dex /etc/dex
+COPY ./scripts/run.sh /etc/dex/
 
 # Copy module files for CVE scanning / dependency analysis.
 COPY --from=builder /usr/local/src/dex/go.mod /usr/local/src/dex/go.sum /usr/local/src/dex/
@@ -66,7 +67,12 @@ COPY --from=builder /usr/local/src/dex/web /srv/dex/web
 
 COPY --from=gomplate /usr/local/bin/gomplate /usr/local/bin/gomplate
 
+# RUN chmod +x /etc/dex/run.sh
+
 USER 1001:1001
+EXPOSE 5556
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+# CMD ["/bin/sh", "-c", "/etc/dex/run.sh"]
 CMD ["dex", "serve", "/etc/dex/config.docker.yaml"]
+
