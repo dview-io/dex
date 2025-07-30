@@ -1,6 +1,6 @@
 module github.com/dexidp/dex
 
-go 1.20
+go 1.23.0
 
 require (
 	entgo.io/ent v0.11.10
@@ -33,7 +33,7 @@ require (
 	golang.org/x/crypto v0.8.0
 	golang.org/x/exp v0.0.0-20221004215720-b9f4876ce741
 	golang.org/x/net v0.10.0
-	golang.org/x/oauth2 v0.8.0
+	golang.org/x/oauth2 v0.27.0
 	google.golang.org/api v0.114.0
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
@@ -42,8 +42,7 @@ require (
 
 require (
 	ariga.io/atlas v0.9.2-0.20230303073438-03a4779a6338 // indirect
-	cloud.google.com/go/compute v1.18.0 // indirect
-	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20220621081337-cb9428e4ac1e // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
